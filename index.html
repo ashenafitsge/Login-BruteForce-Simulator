@@ -1,0 +1,94 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Login BruteForce Simulator - Login</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    body { font-family: Inter, system-ui, Arial; background:#f4f6f8; color:#222; padding:18px; }
+    .card { background:white; border-radius:8px; padding:16px; box-shadow:0 6px 18px rgba(0,0,0,0.06); max-width:900px; margin:auto; }
+    h1 { margin:0 0 8px 0; font-size:20px; }
+    label { display:block; margin-top:8px; font-weight:600; }
+    input { width:100%; padding:8px; margin-top:6px; border-radius:6px; border:1px solid #d1d5db; }
+    .row { display:flex; gap:8px; margin-top:12px; }
+    button { padding:10px 14px; border-radius:6px; border:0; background:#0ea5e9; color:white; cursor:pointer;}
+    .secondary { background:#64748b; }
+    pre { background:#0b1020; color:#dbeafe; padding:12px; border-radius:6px; max-height:300px; overflow:auto; }
+    .status { margin-top:10px; }
+    small { color:#555; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Login BruteForce Simulator — Try Login</h1>
+    <p><small>Demo user: <strong>admin</strong> / <strong>Cyber123!</strong></small></p>
+
+    <div id="result" class="status"></div>
+
+    <label for="username">Username</label>
+    <input id="username" type="text" value="admin" />
+
+    <label for="password">Password</label>
+    <input id="password" type="password" value="" />
+
+    <div class="row">
+      <button id="btn-login">Attempt Login</button>
+      <button id="btn-refresh" class="secondary">Refresh Logs</button>
+      <button id="btn-clear" class="secondary">Clear (manual)</button>
+    </div>
+
+    <h3 style="margin-top:14px">Attempts Log</h3>
+    <pre id="log-area">Loading logs…</pre>
+    <small>Logs auto-refresh every 4s. Clearing logs must be done from the terminal or by using the server clear endpoint (if added).</small>
+  </div>
+
+<script>
+  const logArea = document.getElementById('log-area');
+  const result = document.getElementById('result');
+
+  async function fetchLogs() {
+    try {
+      const res = await fetch('/logs');
+      if (!res.ok) throw new Error('Failed to fetch logs');
+      const text = await res.text();
+      logArea.textContent = text || "(no logs yet)";
+    } catch (e) {
+      logArea.textContent = 'Error fetching logs: ' + e.message;
+    }
+  }
+
+  async function attemptLogin() {
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value;
+    result.textContent = 'Trying...';
+
+    try {
+      const res = await fetch('/attempt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+      const data = await res.json();
+      if (data.success) {
+        result.innerHTML = `<span style="color:green">✅ ${data.message}</span>`;
+      } else {
+        result.innerHTML = `<span style="color:crimson">❌ ${data.message}</span>`;
+      }
+      // refresh logs after the attempt
+      setTimeout(fetchLogs, 300);
+    } catch (e) {
+      result.innerHTML = `<span style="color:crimson">Error: ${e.message}</span>`;
+    }
+  }
+
+  document.getElementById('btn-login').addEventListener('click', attemptLogin);
+  document.getElementById('btn-refresh').addEventListener('click', fetchLogs);
+  document.getElementById('btn-clear').addEventListener('click', () => {
+    alert('To clear logs, delete contents of attemptslog.txt in the project folder or ask the server owner to enable /clear endpoint.');
+  });
+
+  fetchLogs();
+  setInterval(fetchLogs, 4000);
+</script>
+</body>
+</html>

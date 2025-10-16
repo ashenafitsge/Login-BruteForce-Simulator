@@ -1,6 +1,0 @@
-# attempts log - created by loginsimulator
-2025-10-16 06:47:49 | user:admin | pass:Cyber123 | FAILED
-2025-10-16 06:48:25 | user:admin | pass:Cyber123 | FAILED
-2025-10-16 06:48:27 | user:admin | pass:Cyber123 | FAILED
-2025-10-16 06:48:28 | user:admin | pass:Cyber123 | FAILED
-2025-10-16 06:48:49 | user:admin | pass:Cyber123! | SUCCESS
